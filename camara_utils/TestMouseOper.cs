@@ -7,6 +7,7 @@ public class TestMouseOper : MonoBehaviour {
 	public float angle = 1.8f;
     public float moveSpeed = 10;
     public float rotateSpeed = 20;
+    public float scrollSense = 0.2f;
 
 	protected Vector3 m_position;
 	protected Vector3 m_angles;
@@ -62,15 +63,22 @@ public class TestMouseOper : MonoBehaviour {
         {
             m_bRotate = true;
         }
+        else if(Input.mouseScrollDelta.magnitude > scrollSense)
+        {
+            float tmp = moveSpeed * Time.deltaTime;
+            m_posTarget += new Vector3(transform.forward.x * tmp, transform.forward.y * tmp, transform.forward.z * tmp) * Mathf.Sign(Input.mouseScrollDelta.y);
+            m_position += new Vector3(transform.forward.x * tmp, transform.forward.y * tmp, transform.forward.z * tmp) * Mathf.Sign(Input.mouseScrollDelta.y);
+        }
         else
         {
             return;
         }
         Vector3 deltaPos = Input.mousePosition - m_mouseLastPos;
+        Vector3 forward = new Vector3(transform.forward.x, 0, transform.forward.z);
+        Vector3 right = new Vector3(transform.right.x, 0, transform.right.z);
+        Vector3 down = transform.forward;
         if(m_bMove)
-        {
-            Vector3 forward = new Vector3(transform.forward.x, 0, transform.forward.z);
-            Vector3 right = new Vector3(transform.right.x, 0, transform.right.z);
+        {            
             float tmp = moveSpeed * Time.deltaTime;
             if (deltaPos.x > float.Epsilon || deltaPos.x < -float.Epsilon)
             {
@@ -96,7 +104,7 @@ public class TestMouseOper : MonoBehaviour {
             m_curAngleVector = GetVector(dis, m_curAngle);
             m_position = m_posTarget + new Vector3(m_curAngleVector.x, distance * Mathf.Sin(angle), m_curAngleVector.z);
         }
-
+       
         m_mouseLastPos = Input.mousePosition;
         m_bRotate = false;
         m_bMove = false;
